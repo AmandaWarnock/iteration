@@ -1,0 +1,130 @@
+---
+title: "Iteration"
+author: Amanda Warnock
+output: github_document
+---
+
+
+```{r}
+library(tidyverse)
+library(rvest)
+```
+
+```{r}
+x_vec = rnorm(25, mean = 5, sd = 3)
+
+(x_vec - mean(x_vec)) / sd(x_vec)
+```
+I want a function to compute z scores. 
+
+```{r}
+z_scores = function(x) {
+  
+  z = (x - mean(x)) / sd(x)
+  return(z)
+  
+}
+
+z_scores(x_vec)
+```
+
+try my function on some other things.
+
+```{r, error = TRUE}
+z_scores(3)
+```
+^NA
+
+```{r, error = TRUE}
+z_scores("my name is amanda")
+```
+^error
+
+```{r, error = TRUE}
+z_scores(iris)
+```
+^cant coerce to type double 
+
+```{r, error = TRUE}
+z_scores(sample(c(TRUE, FALSE), 25, replace = TRUE))
+```
+^coerces it, still wrong though
+
+update function to make it break if used wrong
+
+```{r}
+z_scores = function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } else if (length(x) == 1) {
+    stop("Z scores cannot be computed for length 1 vectors")
+  }
+  
+  z = mean(x) / sd(x)
+  
+  z
+}
+```
+
+```{r}
+mean_and_sd = function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } else if (length(x) == 1) {
+    stop("Cannot be computed for length 1 vectors")
+  }
+  
+  mean_x = mean(x)
+  sd_x = sd(x)
+
+  list(mean = mean_x, 
+       sd = sd_x)
+}
+```
+
+check that it works
+```{r}
+x_vec = rnorm(100, mean = 3, sd = 4)
+mean_and_sd(x_vec)
+```
+
+## multiple inputs 
+
+```{r}
+sim_data = tibble(
+  x = rnorm(n = 100, mean = 4, sd = 3)
+)
+
+sim_data %>% 
+  summarize(
+    mu_hat = mean(x),
+    sigma_hat = sd(x)
+  )
+```
+id like to do this ^ w/ a function
+
+```{r}
+sim_mean_sd = function(n, mu, sigma) {
+  
+  sim_data = tibble(
+    x = rnorm(n, mean = mu, sd = sigma),
+  )
+  
+  sim_data %>% 
+    summarize(
+      mu_hat = mean(x),
+      sigma_hat = sd(x)
+    )
+}
+
+sim_mean_sd(100, 6, 3)
+sim_mean_sd(mu = 6, n = 100, sigma = 3)
+```
+(mu and sigma bc true pop parameters)
+(this is positional matching, named matching can also be used and generally should be)
+if you set the originals to numbers, they will be overridden during matching if you specify it 
+
+
+
